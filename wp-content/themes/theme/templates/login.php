@@ -12,14 +12,16 @@
 //$pass= getIdPage('forgot_password');
 get_header();
 global $wpdb;
-$token = $_COOKIE['ssidd'];
-if(!empty($token)) {
-    $userr = $wpdb->get_row("select * from useragency where remeber_token = '{$token}'");
-    if (!empty($userr)) {
-        header("Location: " . home_url());
-        exit;
-    }
-}
+// if($_COOKIE['ssidd']){
+//     $token = $_COOKIE['ssidd'];
+// }
+// if(!empty($token)) {
+//     $userr = $wpdb->get_row("select * from useragency where remeber_token = '{$token}'");
+//     if (!empty($userr)) {
+//         header("Location: " . home_url());
+//         exit;
+//     }
+// }
 ?>
 <main id="login" class="main-v2">
     <section class="login" style="background-image: url('<?= get_template_directory_uri(); ?>/dist/images/bg-login.png')">

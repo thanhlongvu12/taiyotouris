@@ -158,15 +158,19 @@ $uri = get_template_directory_uri();
 <script src="<?= $uri?>/dist/lib/jquery/jquery-ui.js"></script>
 <script src="<?= $uri?>/dist/lib/swiper/swiper-bundle.min.js"></script>
 <script type="text/javascript" src='<?= $uri?>/dist/lib/fancybox/jquery.fancybox.js'></script>
+<script src="<?= get_template_directory_uri();  ?>/dist/lib/lightgallery/js/lightgallery.min.js"></script>
+<script src="<?= get_template_directory_uri();  ?>/dist/lib/lightgallery/js/lg-thumbnail.min.js"></script>
+<!-- <script src="<?= get_template_directory_uri();  ?>/dist/lib/lightgallery/css/lightgallery.min.css"></script> -->
 <script src="<?= $uri?>/dist/lib/bootstrap/js/bootstrap.min.js"></script>
 <script src="<?= $uri?>/dist/lib/slick/slick.min.js"></script>
 <script src="<?= $uri?>/dist/js/aos.js"></script>
 <script src="<?= $uri?>/dist/js/custom.js"></script>
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+<script src="<?= get_template_directory_uri(); ?>/dist/js/sweetalert2.js"></script>
 <script>
     $(document).ready(function () {
-        var cms_adapter_ajax_2 = function cms_adapter_ajax_2($param) {
+        var cms_adapter_ajax = function cms_adapter_ajax($param) {
             var beforeSend = $param.beforeSend || function () {
             };
             var complete = $param.complete || function () {
@@ -181,6 +185,44 @@ $uri = get_template_directory_uri();
                 complete: complete
             });
         };
+
+        $('body').on('click','.follow', function() {
+            var ajaxurl = "<?= admin_url('admin-ajax.php') ?>";
+            event.stopPropagation(); // Ngăn chặn sự kiện tiếp tục lan truyền
+            event.preventDefault(); // Ngăn chặn hành vi mặc định của thẻ <a>
+            var id = $(this).data('id');
+            var $data = {
+                'productId': id,
+                'action': 'userFavorite',
+            };
+
+            var $param = {
+                'type': 'POST',
+                'url': ajaxurl,
+                'data': $data,
+                'callback': function(data) {
+                    var res = JSON.parse(data);
+                    // console.log(res.type);
+                    if(res.status >= 1){
+                        Swal.fire({
+                            icon: 'warning',
+                            text: res.mess,
+                            showConfirmButton: false,
+                            timer: 3000,
+                            footer: 'Bạn có thể đăng nhập <a style="margin: 0 5px;" href="<?= home_url('login') ?>"> tại đây</a>'
+                        })
+                    }else if(res.status === 0) {
+                        if (res.type < 1) {
+                            $('.follow_check_' + id).removeClass("active");
+                        } else {
+                            $('.follow_check_' + id).addClass("active");
+                        }
+                    }
+                }
+            };
+            cms_adapter_ajax($param);
+        })
+
         $("#loading-overlay").hide();
 
         // Hàm để hiển thị overlay

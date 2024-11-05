@@ -44,10 +44,10 @@ $count = count($order);
     }
     
     .check-0{
-        :red;
+       background-color :red;
     }
 </style>
-<div id="loading-overlay">
+ <div id="loading-overlay">
     <div class="spinner"></div>
 </div>
 <input type="hidden" class="count" value="<?= $count ?>">

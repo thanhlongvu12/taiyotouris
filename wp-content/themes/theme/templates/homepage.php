@@ -8,10 +8,24 @@
 /* Template Name:  Trang chủ */
 $uri = get_template_directory_uri();
 $obj = get_queried_object();
+$currentLogin = getLogin();
+
 
 get_header();
 ?>
-
+<style>
+.tab-tour .tab-wrapper .title-tab ul li.active {
+    background-image: url('<?= $uri?>/dist/images/bg-button.svg');
+    color: var(--cl-blue);
+}
+.tab-tour .tab-wrapper .title-tab ul li {
+    background-image: url('<?= $uri?>/dist/images/bg-active.svg');
+    color: white;
+}
+.active {
+    background: var(--cl-red) !important;
+}
+</style>
 <main id="homepage" class="homepage">
     <section class="main-slide">
         <div class="swiper slide-homepage mainslideSwiper">
@@ -55,8 +69,8 @@ get_header();
             <div class="tab-wrapper">
                 <div class="title-tab">
                     <ul>
-                        <li rel="tab1" style="background-image: url('<?= $uri?>/dist/images/bg-button.svg');">Tour du lịch</li>
-                        <li rel="tab2" style="background-image: url('<?= $uri?>/dist/images/bg-button.svg');">Khách sạn</li>
+                        <li rel="tab1">Tour du lịch</li>
+                        <li rel="tab2">Khách sạn</li>
                     </ul>
                 </div>
                 <div class="tab-content">
@@ -86,7 +100,7 @@ get_header();
                                 <span>Ngày khởi hành</span>
                                 <div class="date"><input id="date1" type="text" placeholder="Chọn ngày khởi hành"><i class="fas fa-calendar-check"></i></div>
                             </div>
-                            <button><img src="<?= $uri?>/dist/images/search.svg" alt="search">Tìm kiếm</button>
+                            <button id="search_tour"><img src="<?= $uri?>/dist/images/search.svg" alt="search">Tìm kiếm</button>
                         </div>
                     </div>
                     <div id="tab2" class="content-tab">
@@ -115,7 +129,7 @@ get_header();
                                 <span>Ngày khởi hành</span>
                                 <div class="date"><input type="text" id="date2" placeholder="Chọn ngày khởi hành"><i class="fas fa-calendar-check"></i></div>
                             </div>
-                            <button><img src="<?= $uri?>/dist/images/search.svg" alt="search">Tìm kiếm</button>
+                            <button id="search_hotel"><img src="<?= $uri?>/dist/images/search.svg" alt="search">Tìm kiếm</button>
                         </div>
                     </div>
                 </div>
@@ -127,21 +141,24 @@ get_header();
             <div class="big-item">
                 <div class="title">
                     <h2>Tour du lịch nổi bật</h2>
-                    <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincunt ut laoreet dolore magna aliquam </p>
+                    <p>Tổng hợp những tour du lịch hot nhất hiện nay với mức giá hấp dẫn, khởi hành liên tục, ưu đãi ngập tràn dành cho các "tín đồ xê dịch" tha hồ lựa chọn</p>
                 </div>
                 <div class="row">
                     <?php
                     $tours = get_field('prominent_tour', $obj->ID);
                     foreach ($tours as $tour){
+                        if($currentLogin){
+                            $checkFavorite = $wpdb->get_row("SELECT * FROM user_favorite where product_id = {$tour->ID} AND user_id = {$currentLogin->id}");
+                        }
                         $soTien = get_field('price', $tour->ID);
                         $soTienDaChuyen = number_format($soTien, 0, '.', '.');
                         ?>
                         <div class="col-md-4">
                             <div class="item">
-                                <a href="<?= $tour->guid?>">
+                                <a href="<?= get_permalink($tour->ID) ?>">
                                     <div class="img">
                                         <figure><img src="<?= get_the_post_thumbnail($tour->ID); ?>" alt="banner"></figure>
-                                        <div class="follow"><i class="fal fa-heart"></i></div>
+                                        <div class="follow follow_check_<?= $tour->ID ?> <?= (!empty($checkFavorite)) ? 'active' : '' ?>" data-id="<?= $tour->ID ?>"><i class="fal fa-heart"></i></div>
                                     </div>
                                     <div class="desc">
                                         <h3><?= $tour->post_title; ?></h3>
@@ -1178,6 +1195,40 @@ get_header();
 <?php
 get_footer();
 ?>
+<script>
+    jQuery(document).ready(function () {
+        $('#search_tour').on('click', function () {
+            var tour = $('#tour').find(':selected').val();
+            var citytour = $('#city').find(':selected').val();
+            var datetour = $('#date1').val();
+            setTimeout(function () {
+                window.location.href = 'http://tourhotel.test/danh-sach-tour/?slugTour=' + tour + '&citytour=' + citytour + '&datetour=' + datetour;
+            }, 500);
+        })
+    });
+
+    jQuery(document).ready(function () {
+        $('#search_hotel').on('click', function () {
+            var city_hotel = $('#city_hotel').find(':selected').val();
+            var sl = $('#sl').find(':selected').val();
+            var date2 = $('#date2').val();
+            setTimeout(function () {
+                window.location.href = 'http://tourhotel.test/danh-sach-khach-san/?slughotel=' + city_hotel + '&sl=' + sl + '&datehotel=' + date2;
+            }, 500);
+        });
+        $('.tag_names_combo').on('click', function (e) {
+            e.preventDefault(); // Ngăn chặn hành vi mặc định của thẻ <a>
+            var src = $(this).data('src');
+            window.location.href = src; // Chuyển hướng đến đường dẫn được lưu trong thuộc tính data-src
+        });
+        $('.tags-ht').on('click', function (e) {
+            e.preventDefault(); // Ngăn chặn hành vi mặc định của thẻ <a>
+            var id = $(this).data('id');
+            window.location.href = 'http://tourhotel.test/danh-sach-khach-san/?tags=' + id;
+        });
+    });
+
+</script>
 <script>
     jQuery(document).ready(function() {
         jQuery(function() {

@@ -6,7 +6,8 @@
  *
  * @package theme
  */
-
+$searchKey = $_GET["s"];
+echo $searchKey;
 get_header();
 ?>
 

@@ -9,6 +9,7 @@
 include (TEMPLATEPATH . '/functions-search.php');
 require get_template_directory() . '/function-ajax-customer.php';
 require get_template_directory() . '/function-config.php';
+require get_template_directory() . '/function-ajax-action.php';
 
 if ( ! function_exists( 'theme_setup' ) ) :
 	/**
@@ -335,4 +336,18 @@ function generate_order_code($table_name) {
     }
 
     return $cartcode;
+}
+
+function formatShortNumber($number) {
+    $siSymbols = ['', 'k', 'M', 'B', 'T'];
+    $tier = floor(log10(abs($number)) / 3);
+
+    if ($tier == 0) return $number;
+
+    $suffix = $siSymbols[$tier];
+    $scale = pow(10, $tier * 3);
+
+    $scaledNumber = $number / $scale;
+
+    return number_format($scaledNumber, 1) . $suffix;
 }

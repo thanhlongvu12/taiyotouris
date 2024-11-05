@@ -82,12 +82,9 @@ $login= getIdPage('login');
                 <h2>Yêu thích</h2>
                 <div class="list-item">
                     <ul>
-                        <li><a href=""><img src="<?= get_template_directory_uri(); ?>/dist/images/tour.svg" alt="user">Tour</a>
+                        <li><a href="<?= get_permalink(getIdPage('tours_liked'))?>"><img src="<?= get_template_directory_uri(); ?>/dist/images/tour.svg" alt="user">Tour</a>
                         </li>
-                        <li><a href=""><img src="<?= get_template_directory_uri(); ?>/dist/images/hotel.svg"
-                                                                                         alt="user">Khách sạn</a></li>
-                        <li><a href=""><img src="<?= get_template_directory_uri(); ?>/dist/images/combo.svg"
-                                                                                         alt="user">Combo</a></li>
+                        <li><a href=""><img src="<?= get_template_directory_uri(); ?>/dist/images/hotel.svg" alt="user">Khách sạn</a></li>
                     </ul>
                 </div>
             </div>

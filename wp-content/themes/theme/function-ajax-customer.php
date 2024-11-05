@@ -671,3 +671,4 @@ function cancel_order()
     $rs['mess'] = "Cập nhật thành công";
     returnajax($rs);
 }
+

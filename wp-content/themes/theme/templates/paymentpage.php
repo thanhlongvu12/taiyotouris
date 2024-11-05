@@ -32,7 +32,7 @@ get_header();
 <input type="hidden" name="price-adult" id="price-adult" value="<?= $price_tour ?>">
 <input type="hidden" name="price-child" id="price-child" value="0">
 <main id="book-room">
-    <div class="nor-book"><i class="far fa-stopwatch"></i> Nếu quý khách hàng không thực hiện thanh toán đơn hàng tự động hủy sau 30:00</div>
+    <div class="nor-book"><i class="far fa-stopwatch"></i>Nếu quý khách hàng không thực hiện thanh toán đơn hàng tự động hủy sau 30:00</div>
     <section class="bookroom-1 bookroom-2">
         <div class="container">
             <div class="content">

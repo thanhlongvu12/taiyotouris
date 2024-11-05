@@ -37,6 +37,8 @@ if ($currentLogin) {
     <link rel="stylesheet" href="<?= $uri?>/dist/css/normalize.min.css">
     <link rel="stylesheet" href="<?= $uri?>/dist/css/aos.css">
     <link rel="stylesheet" href="<?= $uri?>/dist/css/style.css">
+    <link rel="stylesheet" href="<?= get_template_directory_uri(); ?>/dist/lib/lightgallery/css/lightgallery.min.css">
+    <link rel="stylesheet" href="<?= get_template_directory_uri(); ?>/dist/lib/lightgallery/css/lg-thumbnail.min.css">
 </head>
 
 <body>
@@ -70,6 +72,57 @@ if ($currentLogin) {
     .category-hotel-2__2 .content .main-content .col-right .hotel-item .desc .title .follow .active {
         color: #e54141;
     }
+
+    .user .n-login{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 15px 30px;
+        border-radius: 10px;
+        background: var(--cl-red);
+    }
+    .drop-search{
+        display: none;
+        position: absolute;
+        left: 0;
+        padding-top: 10px;
+    }
+
+    .drop-search.onsearch {
+        display: block;
+        left: inherit;
+        z-index: 1000;
+    }
+
+    .drop-search form{
+        display: flex;
+        align-items: center;
+    }
+    form input{
+        border: 0;
+        padding: 8px 25px;
+        border-radius: 8px 0 0 8px;
+        outline: 0;
+        font-size: 14px;
+        line-height: 20px;
+        font-family: var(--f-body);
+        font-weight: 400;
+        color: var(--cl-black);
+        height: 40px;
+        width: 230px;
+    }
+
+    form button{
+        border: 0;
+        padding: 0;
+        color: var(--cl-red);
+        font-weight: 700;
+        margin-left: -5px;
+        width: 40px;
+        height: 40px;
+        background: var(--cl-white);
+        border-radius: 0 8px 8px 0;
+    }
 </style>
 <div class="divgif">
     <img class="iconloadgif" src="<?= $uri; ?>/dist/images/loading2.gif" alt="">
@@ -79,7 +132,7 @@ if ($currentLogin) {
         <div class="header-desktop">
             <div class="header-inner">
                 <div class="header-logo">
-                    <a href="#">
+                    <a href="<?= get_permalink(getIdPage("homepage"))?>">
                         <figure><img src="<?= $uri?>/dist/images/logo.png" alt="logo"></figure>
                     </a>
                 </div>
@@ -89,7 +142,19 @@ if ($currentLogin) {
                     </div>
                     <div class="header-right">
                         <div class="search">
-                            <div class="bnt-search"><button><img src="<?= $uri?>/dist/images/search.svg" alt="search"></button></div>
+                            <div class="bnt-search">
+                                <button>
+                                    <img src="<?= $uri?>/dist/images/search.svg" alt="search">
+                                </button>
+                            </div>
+                            <div class="drop-search">
+                                <div class="search-inner">
+                                    <form method="" action="/">
+                                        <input type="search" id="input_search" name="s" placeholder="Tìm kiếm" required="required">
+                                        <button><i class="fal fa-search"></i></button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                         <div class="cart">
                             <div class="bnt-cart">
@@ -100,9 +165,9 @@ if ($currentLogin) {
                         <div class="user">
                             <?php if (empty($currentLogin->email)) : ?>
                                 <div class="n-login">
-                                    <a href="<?= get_permalink($idregisster) ?>">Đăng ký</a>
+                                    <a href="<?= get_permalink($idregisster) ?>" style="color: white">Đăng ký</a>
                                     <span>/</span>
-                                    <a href="<?= get_permalink($idlogin) ?>">Đăng nhập</a>
+                                    <a href="<?= get_permalink($idlogin) ?>" style="color: white">Đăng nhập</a>
                                 </div>
                             <?php else : ?>
                                 <div class="y-login" style="display: block;">
@@ -137,3 +202,14 @@ if ($currentLogin) {
         </div>
     </div>
 </header>
+<script>
+    // Get the button and the drop-search div
+    const searchButton = document.querySelector('.bnt-search');
+    const dropSearch = document.querySelector('.drop-search');
+
+    // Add a click event listener to the button
+    searchButton.addEventListener('click', function() {
+        // Toggle the 'active' class on the drop-search div
+        dropSearch.classList.toggle('onsearch');
+    });
+</script>

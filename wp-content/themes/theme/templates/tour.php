@@ -36,35 +36,48 @@ $argsQuocTe = array(
 
 $toursNoiDia = new WP_Query($argsNoiDia);
 $toursQuocTe = new WP_Query($argsQuocTe);
-
 get_header();
 ?>
 <main id="category-tour">
     <section class="category-hotel-1" style="background-image: url('<?= $uri?>/dist/images/cate-hotel-1.png')">
         <div class="container">
             <div class="content">
-                <form action="<?= get_permalink(getIdPage('tour-search')); ?>" method="get">
-                    <div class="book-option">
-                        <div class="item">
-                            <strong>Bạn muốn đi</strong>
-                            <select name="city" id="city">
-                                <option value="Phú Quốc">Phú Quốc</option>
-                                <option value="Hàn Quốc">Hàn Quốc</option>
-                            </select>
-                        </div>
-                        <div class="item">
-                            <strong>Ngày đi</strong>
-                            <div class="date"><input type="date" name="ngay_di" value="" min="<?= date('Y-m-d');?>"></div>
-                        </div>
-                        <div class="item">
-                            <strong>Ngày về</strong>
-                            <div class="date"><input type="date" name="ngay_ve" value="" min="<?= date('Y-m-d');?>"></div>
-                        </div>
-                        <div class="item">
-                            <button><img src="<?= $uri?>/dist/images/search.svg" alt="search">Tìm kiếm</button>
+                <div class="book-option">
+                    <div class="item">
+                        <strong>Bạn muốn đi</strong>
+                        <select name="city_tour" id="city_tour">
+                            <option value="1">Thành phố, địa danh</option>
+                            <option value="nha_trang">Nha Trang</option>
+                            <option value="hue">Huế</option>
+                            <option value="da_nang">Đà Nẵng</option>
+                            <option value="phu_quoc">Phú Quốc</option>
+                        </select>
+                    </div>
+                    <div class="item">
+                        <strong>Điểm khởi hành</strong>
+                        <select name="city_start" id="city_start">
+                            <option value="1">Thành phố</option>
+                            <option value="ha_noi">Hà Nội</option>
+                            <option value="ho_chi_minh">Hồ Chí Minh</option>
+                            <option value="hai_phong">Hải Phòng</option>
+                        </select>
+                    </div>
+                    <div class="item">
+                        <strong>Ngày đi</strong>
+                        <div class="date">
+                            <input type="text" id="date1" placeholder="Chọn ngày khởi hành"><i class="fas fa-calendar-check"></i>
                         </div>
                     </div>
-                </form>
+                    <div class="item">
+                        <strong>Ngày về</strong>
+                        <div class="date">
+                            <input type="text" id="date2" placeholder="Chọn ngày trở về"><i class="fas fa-calendar-check"></i>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <button id="search_hotel"><img src="<?= $uri?>/dist/images/search.svg" alt="search">Tìm kiếm</button>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -313,5 +326,72 @@ get_header();
             nextEl: ".swiper-button-next",
             prevEl: ".swiper-button-prev",
         },
+    });
+</script>
+<script>
+    // jQuery(document).ready(function() {
+    //     var listhotel = new Swiper(".listhotelSwiper", {
+    //         grabCursor: true,
+    //         slidesPerView: "3",
+    //         spaceBetween: 20,
+    //         slideToClickedSlide: true,
+    //         loop: true,
+    //         navigation: {
+    //             nextEl: ".swiper-button-next",
+    //             prevEl: ".swiper-button-prev",
+    //         },
+    //     });
+    //     var discover = new Swiper(".discoverslideSwiper", {
+    //         grabCursor: true,
+    //         slidesPerView: "6",
+    //         spaceBetween: 20,
+    //         slideToClickedSlide: true,
+    //         loop: true,
+    //         navigation: {
+    //             nextEl: ".swiper-button-next",
+    //             prevEl: ".swiper-button-prev",
+    //         },
+    //     });
+    // });
+
+    jQuery(function () {
+        jQuery("#date1").datepicker({
+            minDate: '+1',
+            onSelect: function(selectedDate) {
+                // Get the selected date and add one day to it for date2's minDate
+                var minDateForDate2 = new Date(selectedDate);
+                minDateForDate2.setDate(minDateForDate2.getDate() + 1);
+                // Set the minDate for date2
+                jQuery("#date2").datepicker("option", "minDate", minDateForDate2);
+            }
+        });
+        jQuery("#date2").datepicker();
+
+        jQuery("#date2").focus(function() {
+            // Check if date1 has a selected date
+            if (!jQuery("#date1").val()) {
+                alert("Vui lòng chọn ngày đi trước!");
+                // Optionally focus back to date1
+                jQuery("#date1").focus();
+            }
+        });
+    });
+    jQuery(document).ready(function () {
+        $('#search_hotel').on('click', function () {
+            var city_tour = $('#city_tour').find(':selected').val();
+            var city_start = $('#city_start').find(':selected').val();
+            var date_start = $('#date1').val();
+            var date_end = $('#date2').val();
+            setTimeout(function () {
+                window.location.href = '<?= get_permalink(getIdPage('tour-search')) ?>?slug_tour=' + city_tour + '&city_start='+ city_start + '&date_start=' + date_start + '&date_end=' + date_end;
+            }, 500);
+        })
+        // $('.tourist_attraction').on('click', function () {
+        //     var slug = $(this).data('slug');
+
+        //     setTimeout(function () {
+        //         window.location.href = 'http://taiyotour.test/hotel-search/?location=' + slug;
+        //     }, 500);
+        // })
     });
 </script>
