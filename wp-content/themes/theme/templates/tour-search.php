@@ -46,7 +46,8 @@ $args = array(
 );
 
 $tours = new WP_Query($args);
-get_header();
+$currentLogin = getLogin();
+get_header('v2');
 ?>
 <style>
     .category-hotel-2__2 .content .main-content .col-left .list-bar .price-range .price-bar .price-slider {
@@ -91,7 +92,7 @@ get_header();
         margin: 0;
     }
 </style>
-<main id="category-tour-2">
+<main id="category-tour-2" class="main-v2">
     <section class="category-hotel-1 category-hotel-2__1" style="background-image: url('<?= $uri ?>/dist/images/cate-hotel-21.png')">
         <div class="container">
             <div class="content">
@@ -136,7 +137,7 @@ get_header();
                                             <span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: 0%;"></span>
                                             <span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: 100%;"></span>
                                         </div>
-                                        <p class="price-value">0đ - 10,000,000đ</p>
+                                        <p class="price-value">0đ - 100,000,000đ</p>
                                         <input type="hidden" id="price-min" value="">
                                         <input type="hidden" id="price-max" value="">
                                     </div>
@@ -181,6 +182,9 @@ get_header();
                                     if (!empty(get_the_terms($tour->ID, 'theme_tourist'))) {
                                         $termTopics = get_the_terms($tour->ID, 'theme_tourist');
                                     }
+                                    if($currentLogin){
+                                        $checkFavorite = $wpdb->get_row("SELECT * FROM user_favorite where product_id = {$tour->ID} AND user_id = {$currentLogin->id}");
+                                    }
                                 ?>
                                     <div class="hotel-item">
                                         <div class="img">
@@ -189,7 +193,7 @@ get_header();
                                         <div class="desc">
                                             <div class="title">
                                                 <h3><a href="<?= $tour->guid ?>"><?= $tour->post_title ?></a></h3>
-                                                <button class="follow"><i class="fas fa-heart"></i></button>
+                                                <div class="follow follow_check_<?= $tour->ID ?> <?= (!empty($checkFavorite)) ? 'active' : '' ?>" data-id="<?= $tour->ID ?>"><i class="fal fa-heart"></i></div>
                                             </div>
                                             <div class="rate">
                                                 <i class="fas fa-star"></i>
@@ -334,8 +338,8 @@ get_footer();
         jQuery(".price-slider").slider({
             range: true,
             min: 0,
-            max: 10000000,
-            values: [0, 10000000],
+            max: 100000000,
+            values: [0, 100000000],
             slide: function(event, ui) {
                 var min = Math.round(ui.values[0] / 100000) * 100000;
                 var max = Math.round(ui.values[1] / 100000) * 100000;

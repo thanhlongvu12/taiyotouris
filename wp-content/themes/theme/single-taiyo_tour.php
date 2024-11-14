@@ -20,7 +20,7 @@ $tour_guide = get_field('tour_guide', $id);
 $policy = get_field('policy', $id);
 $number_phone = get_field('phone', $id);
 $currentLogin = getLogin();
-
+// pr($currentLogin);
 // Sử dụng hàm date() để định dạng lại thành ngày tháng năm ở định dạng mới
 $timestamp = DateTime::createFromFormat('d/m/Y', $date);
 $formattedDate = date("Y-m-d", $timestamp->getTimestamp());
@@ -761,7 +761,9 @@ endswitch;
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php foreach ($schedule_start as $start) : ?>
+                                        <?php 
+                                        if($schedule_start):
+                                        foreach ($schedule_start as $start) : ?>
                                             <tr>
                                                 <td><?= $start['from'] ?></td>
                                                 <td><?= $start['date_start'] ?></td>
@@ -769,19 +771,19 @@ endswitch;
                                                 <td class="cyan"><a href="<?= get_permalink(getIdPage('contact')) ?>">Liên hệ</a></td>
                                                 <td class="blue"><?= number_format($start['price'], 0, ",", ".") ?> Đ</td>
                                             </tr>
-                                        <?php endforeach; ?>
+                                        <?php endforeach; endif;?>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                        <div class="info-pay">
+                        <!-- <div class="info-pay">
                             <h2>Thông tin Visa</h2>
                             <div class="list-pay">
                                 <ul>
                                     <?= $visa ?>
                                 </ul>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="info-pay">
                             <h2>Hướng dẫn viên</h2>
                             <div class="list-pay">
@@ -977,11 +979,17 @@ endswitch;
                             <div class="f-item">
                                 <h3>Ưu đãi</h3>
                                 <div class="f-list">
-                                    <ul>
-                                        <?php foreach ($list_endow as $en) : ?>
-                                            <li><?= $en['endow'] ?></li>
-                                        <?php endforeach; ?>
-                                    </ul>
+                                    <?php
+                                    if($list_endow){
+                                        ?>
+                                        <ul>
+                                            <?php foreach ($list_endow as $en) : ?>
+                                                <li><?= $en['endow'] ?></li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                        <?php
+                                    }
+                                    ?>
                                 </div>
                             </div>
                             <div class="f-item">
@@ -1169,6 +1177,7 @@ get_footer();
 </script>
 <script>
     jQuery(document).ready(function($) {
+
         $('.main-accor .item-accor:eq(0) .acc-title').addClass('active').next().slideDown();
         $('.item-accor .acc-title').click(function(j) {
             var dropDown = $(this).closest('.item-accor').find('.acc-content');
@@ -1199,7 +1208,7 @@ get_footer();
     });
     jQuery(document).ready(function() {
         const maxDate = '<?= $formattedDate ?>';
-        console.log(maxDate)
+        // console.log(maxDate)
         jQuery("#date10").datepicker({
             minDate: new Date(),
             // maxDate: new Date('<?= $formattedDate ?>')
@@ -1208,32 +1217,50 @@ get_footer();
 </script>
 <script>
     jQuery(document).ready(function() {
+        var cms_adapter_ajax = function cms_adapter_ajax($param) {
+            var beforeSend = $param.beforeSend || function () {
+            };
+            var complete = $param.complete || function () {
+            }; //
+            $.ajax({
+                url: $param.url,
+                type: $param.type,
+                data: $param.data,
+                beforeSend: beforeSend,
+                async: true,
+                success: $param.callback,
+                complete: complete
+            });
+        };
         $('#order_now').on('click', function() {
-            var login = '<?= $currentLogin->remeber_token ?>';
+            var login = <?php echo !empty($currentLogin->remeber_token) ? "'{$currentLogin->remeber_token}'" : 'false'; ?>;
             if (login) {
                 var id_tour = <?= $id ?>;
                 var date = $('#date10').val();
                 var adult = $('#adult').val();
                 var child = $('#child').val();
                 setTimeout(function() {
-                    window.location.href = '<?= get_permalink(getIdPage('order_tour_now')) ?>?id_tour=' + id_tour + '&&date=' + date + '&&adult=' + adult + '&&child=' + child;
+                    window.location.href = '<?= get_permalink(getIdPage('paymentpage')) ?>?id_tour=' + id_tour + '&&date=' + date + '&&adult=' + adult + '&&child=' + child;
                 }, 500);
             } else {
-                setTimeout(function() {
-                    window.location.href = '<?= get_permalink(getIdPage('login')) ?>';
-                }, 500);
+                Swal.fire({
+                            icon: 'warning',
+                            text: "Vui Lòng Đăng Nhập Để Đến Thanh Toán",
+                            showConfirmButton: false,
+                            timer: 3000,
+                            footer: 'Bạn có thể đăng nhập <a style="margin: 0 5px;" href="<?= home_url('login') ?>"> tại đây</a>'
+                        })
             }
 
-        })
+        });
         $('#add_cart').on('click', function() {
+            var ajaxurl = "<?= admin_url('admin-ajax.php') ?>";
             var id = $(this).data('id');
             var adult = $('#adult').val();
-            var child = $('#child').val();
             var $data = {
                 'productId': id,
                 'adult': adult,
-                'child': child,
-                'action': 'addcart',
+                'action': 'add_cart',
             };
             var $param = {
                 'type': 'POST',
@@ -1244,8 +1271,7 @@ get_footer();
                 }
             };
             cms_adapter_ajax($param);
-
-        })
+        });
     });
 </script>
 <script>

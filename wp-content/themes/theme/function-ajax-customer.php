@@ -382,6 +382,7 @@ function orderNow()
 
 }
 
+//Đặt Phòng Khách Sạn
 add_action('wp_ajax_order_hotel_now', 'order_hotel_now');
 add_action('wp_ajax_nopriv_order_hotel_now', 'order_hotel_now');
 function order_hotel_now()
@@ -619,6 +620,140 @@ function order_hotel_now()
             $rs['mess'] = "Đặt phòng không thành công, vui lòng kiểm tra lại!.";
             returnajax($rs);
         }
+    }
+}
+
+// Thêm vào giỏ hàng
+add_action('wp_ajax_nopriv_add_cart', 'add_cart');
+add_action('wp_ajax_add_cart', 'add_cart');
+
+function add_cart()
+{
+    global $wpdb;
+    if (!isset($_POST['productId'])) {
+        $rs['status'] = error_code;
+        $rs['mess'] = messerror . " Lỗi Validate";
+        returnajax($rs);
+    }
+    $adult = no_sql_injection(xss($_POST['adult']));
+    // $child = no_sql_injection(xss($_POST['child']));
+    $product_id = no_sql_injection(xss($_POST['productId']));
+    $getUser = getLogin();
+    if (empty($getUser)) {
+        $rs['status'] = error_code;
+        $rs['mess'] = messerror . " Lỗi Validate";
+        returnajax($rs);
+    }
+//    $checkcart = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}cart where product_id = {$product_id} AND user_id = {$getUser->id}");
+//    if(empty($checkcart)){
+//
+//    }
+
+    $date_st = get_field('date', $product_id);
+    $date_end = get_field('return_day', $product_id);
+    $price = get_field('price', $product_id);
+    $price_childen = (!empty(get_field('price_childen', $product_id))) ? get_field('price_childen', $product_id) : 0;
+    $date_st = strtotime(str_replace('/', '-', $date_st));
+    $date_end = strtotime(str_replace('/', '-', $date_end));
+    $post_type = get_post_type($product_id);
+    $wpdb->insert(
+        'cart',
+        array(
+            'id_product' => $product_id,
+            'id_user' => $getUser->id,
+            'type_cart' => $post_type,
+            'qty_adult' => $adult,
+            'pirce_adult' => $price,
+            'qty_child' => 0,
+            'pirce_child' => $price_childen,
+            'start_date' => $date_st,
+            'end_date' => $date_end
+        )
+    );
+    $count = $wpdb->get_var("SELECT count(*) FROM `cart` where status_cart < 2  and id_user = {$getUser->id}");
+    $rs['status'] = success_code;
+    $rs['mess'] = 'Sản phẩm đã được thêm vào giỏ hàng của bạn!';
+    $rs['count'] = $count;
+    returnajax($rs);
+}
+
+add_action('wp_ajax_nopriv_check_cart', 'check_cart');
+add_action('wp_ajax_check_cart', 'check_cart');
+
+function check_cart()
+{
+    global $wpdb;
+    $id = no_sql_injection(xss($_POST['id']));
+    $value = no_sql_injection(xss($_POST['val']));
+    $type_c = no_sql_injection(xss($_POST['type']));
+    if (!isset($id)) {
+        $rs['status'] = error_code;
+        $rs['mess'] = messerror . " Lỗi Validate";
+        returnajax($rs);
+    }
+    $getUser = getLogin();
+    if (empty($getUser)) {
+        $rs['status'] = error_code;
+        $rs['mess'] = messerror . " Lỗi Validate";
+        returnajax($rs);
+    }
+    if($type_c == 'tour'){
+        $ty = 'taiyo_tour';
+    }else{
+        $ty = 'khach_san';
+    }
+    if ($id != '-1') {
+        $checkcart = $wpdb->get_row("SELECT * FROM `cart` where status_cart < 2 and  id = {$id} AND type_cart = '{$ty}' AND id_user = {$getUser->id}");
+//    print_r($wpdb->last_query);die();
+        if (empty($checkcart)) {
+            $rs['status'] = error_code;
+            $rs['mess'] = "Đơn hàng không tồn tại vui lòng kiểm tra lại";
+            returnajax($rs);
+        } else {
+            $wpdb->update(
+                'cart',
+                array(
+                    'status_cart' => $value,
+                ),
+                where: array(
+                    'id' => $id,
+                    'id_user' => $getUser->id
+                )
+            );
+//        print_r($wpdb->last_query);die();
+        }
+        $cart = $wpdb->get_results("SELECT id_product as id_post, qty_adult as nguoilon,qty_child as trecon, id,pirce_adult, pirce_child ,start_date,end_date FROM `cart` where status_cart = 1  AND type_cart = '{$ty}'  AND id_user = {$getUser->id}");
+//        print_r($wpdb->last_query);die();
+        $rs['status'] = success_code;
+        $rs['data'] = $cart;
+        returnajax($rs);
+    } else {
+        $checkcart = $wpdb->get_results("SELECT * FROM `cart` where status_cart < 2 AND type_cart = '{$ty}' and  id_user = {$getUser->id}");
+        if (empty($checkcart)) {
+            $rs['status'] = error_code;
+            $rs['mess'] = "Đơn hàng không tồn tại vui lòng kiểm tra lại";
+            returnajax($rs);
+        } else {
+            foreach ($checkcart as $values):
+                $wpdb->update(
+                    'cart',
+                    array(
+                        'status_cart' => $value,
+                    ),
+                    array(
+                        'id' => $values->id,
+                        'id_user' => $getUser->id
+                    )
+                );
+//                print_r($wpdb->last_query);die();
+            endforeach;
+//        print_r($wpdb->last_query);die();
+        }
+        $cart = $wpdb->get_results("SELECT id_product as id_post, qty_adult as nguoilon,qty_child as trecon, id,pirce_adult, pirce_child,start_date,end_date FROM `cart` where status_cart = 1  AND type_cart = '{$ty}'  AND id_user = {$getUser->id}");
+//        print_r($wpdb->last_query);die();
+        $rs['status'] = success_code;
+        $rs['data'] = $cart;
+        returnajax($rs);
     }
 }
 

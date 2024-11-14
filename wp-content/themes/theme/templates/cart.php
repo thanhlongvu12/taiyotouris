@@ -2,10 +2,12 @@
 /* Template Name: Giỏ hàng */
 get_header("v2");
 $currentLogin = getLogin();
-// $checkFavorite = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}cart where type_cart = 'taiyotourist' and status_cart < 2 AND id_user = {$currentLogin->id} order by id desc ");
-// $checkcart = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}cart where type_cart = 'khach_san' and status_cart < 2 AND id_user = {$currentLogin->id} order by id desc ");
-$checkFavorite = [];
-$checkcart = [];
+//tour
+$checkFavorite = $wpdb->get_results("SELECT * FROM `cart` where type_cart = 'taiyo_tour' and status_cart < 2 AND id_user = {$currentLogin->id} order by id desc");
+//khach san
+// $checkcart = $wpdb->get_results("SELECT * FROM `cart` where type_cart = 'khach_san' and status_cart < 2 AND id_user = {$currentLogin->id} order by id desc ");
+// $checkFavorite = [];
+// $checkcart = [];
 ?>
 <style>
     #loading-overlay {
@@ -50,9 +52,9 @@ $checkcart = [];
         padding-top: 50px;
     }
 </style>
-<div id="loading-overlay">
+<!-- <div id="loading-overlay">
     <div class="spinner"></div>
-</div>
+</div> -->
 <main id="shipping-cart" class="main-v2">
     <section class="ticket-visa-1">
         <div class="container">
@@ -88,7 +90,7 @@ $checkcart = [];
                             <?php foreach ($checkFavorite as $value):
 
                                 $thumbnail_id = get_post_thumbnail_id($value->id_product);
-                                $thumbnail_url = wp_get_attachment_image_src($thumbnail_id, 'full');
+                                $thumbnail_url = wp_get_attachment_image_src(attachment_id: $thumbnail_id);
                                 ?>
                                 <tr class="data_cart_<?= $value->id ?>">
                                     <td><input type="checkbox" name="" id=""
@@ -121,18 +123,6 @@ $checkcart = [];
                                                         đ</strong></li>
                                                 <li>
                                                     <span>Tổng tiền</span><strong><?= money_check($value->qty_adult * get_field('price', $value->id_product)) ?>
-                                                        đ</strong></li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="tour-time">
-                                            <ul>
-                                                <li>
-                                                    <span>X<?= $value->qty_child ?></span><strong><?= money_check(get_field('price_childen', $value->id_product)) ?>
-                                                        đ</strong></li>
-                                                <li>
-                                                    <span>Tổng tiền</span><strong><?= money_check($value->qty_child * get_field('price_childen', $value->id_product)) ?>
                                                         đ</strong></li>
                                             </ul>
                                         </div>
@@ -173,123 +163,7 @@ $checkcart = [];
                         </div>
                     </div>
                 </div>
-                <div class="table-cart hotel">
-                    <strong class="dcart_ht">Số lượng: <?= count($checkcart) ?> Đơn hàng</strong>
-                    <div class="table-list">
-                        <table class="table">
-                            <thead>
-                            <tr>
-                                <th scope="col"><input type="checkbox" name="" id="check_pay_all_ht"></th>
-                                <th scope="col">Tên Khách sạn</th>
-                                <th scope="col">Tên Phòng</th>
-                                <th scope="col">Thời gian</th>
-                                <th scope="col">Giá vé / đêm</th>
-                                <th scope="col"></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <?php foreach ($checkcart as $value):
-
-                                $thumbnail_id = get_post_thumbnail_id($value->id_product);
-                                $thumbnail_url = wp_get_attachment_image_src($thumbnail_id, 'full');
-                                ?>
-                                <tr class="data_cart_<?= $value->id ?>">
-                                    <td><input type="checkbox" name="" id=""
-                                               class="check_pay_ht check_pay_ht_<?= $value->id ?>" <?= ($value->status_cart == 1) ? 'checked' : '' ?>
-                                               data-id="<?= $value->id ?>"></td>
-                                    <td>
-                                        <div class="img-tour">
-                                            <div class="img">
-                                                <figure><img
-                                                            src="<?= $thumbnail_url[0] ?>"
-                                                            alt="tour"></figure>
-                                            </div>
-                                            <a href="<?= get_permalink($value->id_product) ?>"><?= get_the_title($value->id_product) ?></a>
-                                        </div>
-                                    </td>
-                                    <td>
-
-                                        <?= get_the_title($value->id_room) ?>
-
-                                    </td>
-                                    <td>
-                                        <div class="tour-time">
-                                            <ul>
-                                                <li><span>Ngày đi</span><strong><?= date('d', $value->start_date) ?>
-                                                        tháng <?= date('m', $value->start_date) ?></strong></li>
-                                                <li><span>Ngày về</span><strong><?= date('d', $value->end_date) ?>
-                                                        tháng <?= date('m', $value->end_date) ?></strong></li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                    <?php
-                                    $checkInDate = new DateTime('@' . $value->start_date);
-                                    $checkOutDate = new DateTime('@' . $value->end_date);
-
-                                    // Tính số đêm giữa hai thời điểm
-                                    $interval = $checkInDate->diff($checkOutDate);
-                                    $numberOfNights = $interval->format('%a');
-
-                                    // Lấy giá trị tuyệt đối của số đêm
-                                    $numberOfNights = abs($numberOfNights);
-                                    ?>
-                                    <td>
-                                        <div class="tour-time">
-                                            <ul>
-                                                <li>
-                                                    <strong><?= money_check(get_field('detail', $value->id_room)['price']) ?>
-                                                        đ</strong> x <span><?= $numberOfNights ?> đêm </span></li>
-                                                <li>
-                                                    <span>Tổng tiền</span><strong><?= money_check($numberOfNights * get_field('detail', $value->id_room)['price']) ?>
-                                                        đ</strong></li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <button class="remove_cart" data-align="<?= $value->id ?>"><i
-                                                    class="far fa-trash-alt"></i></button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                        <div class="total total_h">
-                            <div class="left">
-                                <label for="">tất cả : <?= count($checkcart) ?> đơn hàng</label>
-                            </div>
-                            <?php
-                            $dem = 0;
-                            $tong = 0;
-                            foreach ($checkcart as $value):
-                                $checkInDate = new DateTime('@' . $value->start_date);
-                                $checkOutDate = new DateTime('@' . $value->end_date);
-
-                                // Tính số đêm giữa hai thời điểm
-                                $interval = $checkInDate->diff($checkOutDate);
-                                $numberOfNights = $interval->format('%a');
-
-                                // Lấy giá trị tuyệt đối của số đêm
-                                $numberOfNights = abs($numberOfNights);
-                                if ($value->status_cart == 1) {
-                                    $dem++;
-                                    $al = $numberOfNights * get_field('detail', $value->id_room)['price'];
-                                    $tong += $al;
-                                }
-                            endforeach;
-                            ?>
-                            <div class="right">
-                                <div class="i-item">
-                                    <p class="count_thanh_ht"><strong>Tổng thanh toán</strong>(<?= $dem ?> đơn hàng):
-                                    </p>
-                                    <span class="sum_cart_ht"><?= money_check($tong) ?> đ</span>
-                                </div>
-                                <button class="submit-cart" data-href="<?= home_url('yeu-cau-dat-phong') ?>">Thanh
-                                    toán
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                
             </div>
         </div>
     </section>
@@ -300,6 +174,22 @@ get_footer();
 
 <script>
     $(document).ready(function () {
+        var cms_adapter_ajax = function cms_adapter_ajax($param) {
+            var beforeSend = $param.beforeSend || function () {
+            };
+            var complete = $param.complete || function () {
+            }; //
+            $.ajax({
+                url: $param.url,
+                type: $param.type,
+                data: $param.data,
+                beforeSend: beforeSend,
+                async: true,
+                success: $param.callback,
+                complete: complete
+            });
+        };
+        var ajaxurl = "<?= admin_url('admin-ajax.php') ?>";
         function money_check(number) {
             return number.toLocaleString('en-US', {style: 'decimal', minimumFractionDigits: 0});
         }
@@ -335,8 +225,7 @@ get_footer();
         $('.check_pay').on('click', function () {
             var id = $(this).data('id');
             var data = $(this).is(':checked') ? '1' : '0';
-
-            var $data = {
+            var objData = {
                 'id': id,
                 'val': data,
                 'type': 'tour',
@@ -345,7 +234,7 @@ get_footer();
             var $param = {
                 'type': 'POST',
                 'url': ajaxurl,
-                'data': $data,
+                'data': objData,
                 'beforeSend': function () {
                     showLoadingOverlay();
                 },

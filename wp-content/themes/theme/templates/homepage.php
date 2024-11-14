@@ -14,7 +14,7 @@ $currentLogin = getLogin();
 get_header();
 ?>
 <style>
-.tab-tour .tab-wrapper .title-tab ul li.active {
+    .tab-tour .tab-wrapper .title-tab ul li.active {
     background-image: url('<?= $uri?>/dist/images/bg-button.svg');
     color: var(--cl-blue);
 }
@@ -22,9 +22,7 @@ get_header();
     background-image: url('<?= $uri?>/dist/images/bg-active.svg');
     color: white;
 }
-.active {
-    background: var(--cl-red) !important;
-}
+
 </style>
 <main id="homepage" class="homepage">
     <section class="main-slide">
@@ -1202,7 +1200,7 @@ get_footer();
             var citytour = $('#city').find(':selected').val();
             var datetour = $('#date1').val();
             setTimeout(function () {
-                window.location.href = 'http://tourhotel.test/danh-sach-tour/?slugTour=' + tour + '&citytour=' + citytour + '&datetour=' + datetour;
+                window.location.href = '<?= get_permalink(getIdPage('tour-search')) ?>?slugTour=' + tour + '&citytour=' + citytour + '&datetour=' + datetour;
             }, 500);
         })
     });

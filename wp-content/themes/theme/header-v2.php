@@ -157,10 +157,19 @@ if ($currentLogin) {
                             </div>
                         </div>
                         <div class="cart">
-                            <div class="bnt-cart">
-                                <button><img src="<?= $uri?>/dist/images/cart-2.svg" alt="cart"></button>
-                                <div class="label"><span>3</span></div>
-                            </div>
+                            <?php
+                                if ($currentLogin) {
+                                    $count = $wpdb->get_var("SELECT count(*) FROM `cart` where id_user = {$currentLogin->id} and status_cart < 2 ");
+                                }else{
+                                    $count = 0;
+                                }
+                            ?>
+                            <a href="<?= get_permalink(getIdPage("cart"))?>">
+                                <div class="bnt-cart">
+                                    <button><img src="<?= $uri?>/dist/images/cart-2.svg" alt="cart"></button>
+                                    <div class="label" style="<?= ($count == 0) ? 'display:none' : '' ?>"><span><?= $count ?></span></div>
+                                </div>
+                            </a>
                         </div>
                         <div class="user">
                             <?php if (empty($currentLogin->email)) : ?>

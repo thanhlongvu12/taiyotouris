@@ -200,6 +200,12 @@ $uri = get_template_directory_uri();
                 'type': 'POST',
                 'url': ajaxurl,
                 'data': $data,
+                'beforeSend': function () {
+                    showLoadingOverlay();
+                },
+                'complete': function () {
+                    hideLoadingOverlay();
+                },
                 'callback': function(data) {
                     var res = JSON.parse(data);
                     // console.log(res.type);
@@ -223,18 +229,6 @@ $uri = get_template_directory_uri();
             cms_adapter_ajax($param);
         })
 
-        $("#loading-overlay").hide();
-
-        // Hàm để hiển thị overlay
-        function showLoadingOverlay() {
-            $(".divgif").show();
-        }
-
-        // Hàm để tắt overlay
-        function hideLoadingOverlay() {
-            $(".divgif").hide();
-        }
-
         $('.logout').on('click',function () {
             var $data = {
                 'action': 'logout',
@@ -257,6 +251,18 @@ $uri = get_template_directory_uri();
             };
             cms_adapter_ajax_2($param);
         })
+
+        $("#loading-overlay").hide();
+
+        // Hàm để hiển thị overlay
+        function showLoadingOverlay() {
+            $(".divgif").show();
+        }
+
+        // Hàm để tắt overlay
+        function hideLoadingOverlay() {
+            $(".divgif").hide();
+        }
     });
 </script>
 </body>
